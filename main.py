@@ -5,6 +5,7 @@ from multiprocessing import Process
 from time import sleep
 from string import ascii_letters
 
+
 alpha = ascii_letters + '1234567890'
 site = 'https://goo.su' # Сайт для сокращения ссылок
 is_open =  0 # Открывать ли вкладку
