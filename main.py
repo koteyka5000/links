@@ -1,17 +1,18 @@
-import webbrowser
-import requests
-import random
-from multiprocessing import Process
+import webbrowser  # Для открытия ссылок в браузере
+import requests  # Для проверки кода ответа от сайта
+import random  # Для генерации случайной ссылки
+from multiprocessing import Process  # Для работы в нескольких процессах одновременно
 from time import sleep
 from string import ascii_letters
 
 
 alpha = ascii_letters + '1234567890'
 site = 'https://goo.su' # Сайт для сокращения ссылок
-is_open =  0 # Открывать ли вкладку
+is_open =  0 # Открывать ли ссылку в браузере
 is_write = 1 # Записывать ли ссылку в файл
 string_len = 5 # Длинна строки для подбора
 max_combo_to_block = 2 # необходимое количество подряд открытых вкладок для аварийного завершения и предотвращения спама вкладками
+processes = 2 # Во сколько процессов работать (больше -> быстрее, но можно получить блокировку на сайте)
 
 def run():
     last = 0
@@ -27,10 +28,13 @@ def run():
 
         if status_code != 404:
             if status_code == 429:
-                print('===EMERGENCY EXIT===')
+                print('===BLOCKED===')
                 print('NOTE: Попробуй использовать меньше процессов, ведь сайт заблокировал запросы за слишком частую отправку')
-                sleep(5)
-                exit()
+                while status_code == 429:
+                    sleep(3)
+                    status_code = requests.head(f'{site}/{s}').status_code
+                print('!UNBLOCKED')
+                continue
             if last >= max_combo_to_block:
                 print('>>> BLOCKED')
                 print('NOTE: Сработала защита от спама вкладок в браузере, ведь подряд было открыто <max_combo_to_block> вкладок')
@@ -47,7 +51,7 @@ def run():
             last = 0
 
 if __name__ == '__main__':
-    for w in range(2):  
+    for w in range(processes):  
         p = Process(target=run)  
         p.start()
 
