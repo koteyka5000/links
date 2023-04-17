@@ -48,7 +48,14 @@ def run():
                 sleep(5)
                 exit()
             print('^^^^^===^^^===========================================')
-            r = requests.get(f'{site}/{s}') # head не содержит переадресованной ссылки, а get содержит, но get работает медленнее
+            try:
+                r = requests.get(f'{site}/{s}') # head не содержит переадресованной ссылки, а get содержит, но get работает медленнее
+            except:
+                with open('urls', 'a') as f:
+                    now = datetime.datetime.now()
+                    time = now.strftime("%d.%m %H:%M:%S")
+                    f.write(f'[{time}] -> {site}/{s} | FATAL ERROR')
+                    continue
 
             if 'https://cards.metro-cc.ru/' in r.url: # Если сайт это metro
                 print('==METRO==')
