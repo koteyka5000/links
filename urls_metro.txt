@@ -1,1 +1,4 @@
 [17.04 10:49:05] -> https://goo.su/6C7tr | https://cards.metro-cc.ru/letter_page/?barcode=15928f2daf3362a2b7652b32c9b4cd85&t=new_reg
+[17.04 21:48:56] -> https://goo.su/Trrki | https://cards.metro-cc.ru/letter_page/?barcode=7277596dab75fcd2d1d77d95adb6ae7d&t=2
+[17.04 21:50:47] -> https://goo.su/l3nut | https://cards.metro-cc.ru/letter_page/?barcode=b5b68074c1c24740e7fb7d8f41fcf323&t=new_reg
+[17.04 21:55:21] -> https://goo.su/jSKYV | https://cards.metro-cc.ru/letter_page/?barcode=c9eb17765bc21c9b36f398c01fa2b5d1&t=new_reg
