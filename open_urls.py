@@ -5,4 +5,4 @@ with open('urls', 'r') as f:
     for url in urls:
         start = url.find('->') + 3
         stop = url.find(' | ')
-        print(url[start:stop])
+        webbrowser.open((url[start:stop]), new=2)

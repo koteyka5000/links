@@ -64,6 +64,8 @@ def run():
                 print('>>>UNBLOCKED')
                 continue
 
+            print('^^^^^===^^^===========================================')
+
             # Третья защита
             if combo_opened_urls >= max_combo_to_block:
                 print('>>> BLOCKED')
@@ -82,8 +84,6 @@ def run():
                 print('==METRO==')
                 write('urls_metro.txt', url, r.url)
                 continue
-
-            print('^^^^^===^^^===========================================')
 
             if is_open:
                 webbrowser.open(url, new=2)
