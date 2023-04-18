@@ -28,8 +28,12 @@ def run():
         s = ''
         for i in range(string_len):
             s += random.choice(alpha)
-
-        r = requests.head(f'{site}/{s}')
+        try:
+            r = requests.head(f'{site}/{s}')
+        except:
+            print('FAILED TO REQUEST, For exit press ctrl+c again')
+            sleep(3)
+            continue
         status_code = r.status_code
         print(f'{s} > {status_code}')
 
@@ -54,7 +58,7 @@ def run():
                 with open('urls', 'a') as f:
                     now = datetime.datetime.now()
                     time = now.strftime("%d.%m %H:%M:%S")
-                    f.write(f'[{time}] -> {site}/{s} | FATAL ERROR')
+                    f.write(f'[{time}] -> {site}/{s} | FATAL ERROR\n')
                     continue
 
             if 'https://cards.metro-cc.ru/' in r.url: # Если сайт это metro
