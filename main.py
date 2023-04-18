@@ -33,13 +33,16 @@ def write(file, url, redirected_url, after_separator=None):
             f.write(f'[{time}] -> {url} | {redirected_url}\n')
 
 def run():
-    last = 0
+    combo_opened_urls = 0
     status_code = None
+    
     while 1:
         s = ''
         for i in range(string_len):
             s += random.choice(alpha)
         url = f'{site}/{s}'
+
+        # Первая защита
         try:
             r = requests.head(url)
         except:
@@ -51,6 +54,7 @@ def run():
         print(f'{s} > {status_code}')
 
         if status_code != 404:
+            # Вторая защита
             if status_code == 429:
                 print('===BLOCKED===')
                 #  NOTE: Попробуй использовать меньше процессов, ведь сайт заблокировал запросы за слишком частую отправку
@@ -59,12 +63,15 @@ def run():
                     status_code = requests.head(url).status_code
                 print('>>>UNBLOCKED')
                 continue
-            if last >= max_combo_to_block:
+
+            # Третья защита
+            if combo_opened_urls >= max_combo_to_block:
                 print('>>> BLOCKED')
                 print('NOTE: Сработала защита от спама вкладок в браузере, ведь подряд было открыто <max_combo_to_block> вкладок')
                 sleep(5)
                 exit()
-            print('^^^^^===^^^===========================================')
+
+            # Четвёртая защита
             try:
                 r = requests.get(url) # head не содержит переадресованной ссылки, а get содержит, но get работает медленнее
             except:
@@ -76,14 +83,15 @@ def run():
                 write('urls_metro.txt', url, r.url)
                 continue
 
+            print('^^^^^===^^^===========================================')
 
             if is_open:
                 webbrowser.open(url, new=2)
             if is_write:
                 write('urls', url, r.url)
-            last += 1
+            combo_opened_urls += 1
         else:
-            last = 0
+            combo_opened_urls = 0
 
 if __name__ == '__main__':
     for w in range(processes):  
