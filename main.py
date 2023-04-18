@@ -94,6 +94,9 @@ def run():
             combo_opened_urls = 0
 
 if __name__ == '__main__':
-    for w in range(processes):  
-        p = Process(target=run)  
-        p.start()
+    if processes == 1:
+        run()
+    else:
+        for w in range(processes):  
+            p = Process(target=run)  
+            p.start()
