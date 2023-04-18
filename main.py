@@ -28,12 +28,14 @@ def run():
         s = ''
         for i in range(string_len):
             s += random.choice(alpha)
+        url = f'{site}/{s}'
         try:
-            r = requests.head(f'{site}/{s}')
+            r = requests.head(url)
         except:
-            print('FAILED TO REQUEST, For exit press ctrl+c again')
+            print('FAILED TO REQUEST!')
             sleep(3)
             continue
+
         status_code = r.status_code
         print(f'{s} > {status_code}')
 
@@ -43,7 +45,7 @@ def run():
                 #  NOTE: Попробуй использовать меньше процессов, ведь сайт заблокировал запросы за слишком частую отправку
                 while status_code == 429:
                     sleep(1)
-                    status_code = requests.head(f'{site}/{s}').status_code
+                    status_code = requests.head(f'{url}').status_code
                 print('>>>UNBLOCKED')
                 continue
             if last >= max_combo_to_block:
@@ -53,12 +55,12 @@ def run():
                 exit()
             print('^^^^^===^^^===========================================')
             try:
-                r = requests.get(f'{site}/{s}') # head не содержит переадресованной ссылки, а get содержит, но get работает медленнее
+                r = requests.get(f'{url}') # head не содержит переадресованной ссылки, а get содержит, но get работает медленнее
             except:
                 with open('urls', 'a') as f:
                     now = datetime.datetime.now()
                     time = now.strftime("%d.%m %H:%M:%S")
-                    f.write(f'[{time}] -> {site}/{s} | FATAL ERROR\n')
+                    f.write(f'[{time}] -> {url} | FATAL ERROR\n')
                     continue
 
             if 'https://cards.metro-cc.ru/' in r.url: # Если сайт это metro
@@ -66,23 +68,23 @@ def run():
                 with open('urls_metro.txt', 'a') as f: # Чтобы не нагружать основной файл
                     now = datetime.datetime.now()
                     time = now.strftime("%d.%m %H:%M:%S")
-                    if f'{site}/{s}' == r.url:
-                        f.write(f'[{time}] -> {site}/{s} | !\n')
+                    if f'{url}' == r.url:
+                        f.write(f'[{time}] -> {url} | !\n')
                     else:
-                        f.write(f'[{time}] -> {site}/{s} | {r.url}\n')
+                        f.write(f'[{time}] -> {url} | {r.url}\n')
                 continue
 
 
             if is_open:
-                webbrowser.open(f'{site}/{s}', new=2)
+                webbrowser.open(f'{url}', new=2)
             if is_write:
                 with open('urls', 'a') as f:
                     now = datetime.datetime.now()
                     time = now.strftime("%d.%m %H:%M:%S")
-                    if f'{site}/{s}' == r.url:
-                        f.write(f'[{time}] -> {site}/{s} | !\n')
+                    if f'{url}' == r.url:
+                        f.write(f'[{time}] -> {url} | !\n')
                     else:
-                        f.write(f'[{time}] -> {site}/{s} | {r.url}\n')
+                        f.write(f'[{time}] -> {url} | {r.url}\n')
             last += 1
         else:
             last = 0
