@@ -21,6 +21,17 @@ except:
     print('Нету файла, возможно неверна директория')
     exit()
 
+def write(file, url, redirected_url, after_separator=None):
+    with open(file, 'a') as f:
+        now = datetime.datetime.now()
+        time = now.strftime("%d.%m %H:%M:%S")
+        if after_separator:
+            f.write(f'[{time}] -> {url} | {after_separator}\n')
+        elif url == redirected_url:
+            f.write(f'[{time}] -> {url} | !\n')
+        else:
+            f.write(f'[{time}] -> {url} | {redirected_url}\n')
+
 def run():
     last = 0
     status_code = None
@@ -45,7 +56,7 @@ def run():
                 #  NOTE: Попробуй использовать меньше процессов, ведь сайт заблокировал запросы за слишком частую отправку
                 while status_code == 429:
                     sleep(1)
-                    status_code = requests.head(f'{url}').status_code
+                    status_code = requests.head(url).status_code
                 print('>>>UNBLOCKED')
                 continue
             if last >= max_combo_to_block:
@@ -55,36 +66,21 @@ def run():
                 exit()
             print('^^^^^===^^^===========================================')
             try:
-                r = requests.get(f'{url}') # head не содержит переадресованной ссылки, а get содержит, но get работает медленнее
+                r = requests.get(url) # head не содержит переадресованной ссылки, а get содержит, но get работает медленнее
             except:
-                with open('urls', 'a') as f:
-                    now = datetime.datetime.now()
-                    time = now.strftime("%d.%m %H:%M:%S")
-                    f.write(f'[{time}] -> {url} | FATAL ERROR\n')
-                    continue
+                write('urls', url, None, 'FATAL ERROR')
+                continue
 
             if 'https://cards.metro-cc.ru/' in r.url: # Если сайт это metro
                 print('==METRO==')
-                with open('urls_metro.txt', 'a') as f: # Чтобы не нагружать основной файл
-                    now = datetime.datetime.now()
-                    time = now.strftime("%d.%m %H:%M:%S")
-                    if f'{url}' == r.url:
-                        f.write(f'[{time}] -> {url} | !\n')
-                    else:
-                        f.write(f'[{time}] -> {url} | {r.url}\n')
+                write('urls_metro.txt', url, r.url)
                 continue
 
 
             if is_open:
-                webbrowser.open(f'{url}', new=2)
+                webbrowser.open(url, new=2)
             if is_write:
-                with open('urls', 'a') as f:
-                    now = datetime.datetime.now()
-                    time = now.strftime("%d.%m %H:%M:%S")
-                    if f'{url}' == r.url:
-                        f.write(f'[{time}] -> {url} | !\n')
-                    else:
-                        f.write(f'[{time}] -> {url} | {r.url}\n')
+                write('urls', url, r.url)
             last += 1
         else:
             last = 0
