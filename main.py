@@ -1,7 +1,7 @@
 import webbrowser  # Для открытия ссылок в браузере
 import requests  # Для проверки кода ответа от сайта
 import random  # Для генерации случайной ссылки
-from multiprocessing import Process  # Для работы в нескольких процессах одновременно
+from multiprocessing import Process, current_process  # Для работы в нескольких процессах одновременно
 from time import sleep
 from string import ascii_letters
 import datetime
@@ -14,6 +14,8 @@ is_write = 1 # Записывать ли ссылку в файл
 string_len = 5 # Длинна строки для подбора
 max_combo_to_block = 2 # необходимое количество подряд открытых вкладок для аварийного завершения и предотвращения спама вкладками
 processes = 2 # Во сколько процессов работать (больше -> быстрее, но можно получить блокировку на сайте)
+continue_if_blocked = True # Продолжать ли выполнение программы при блокировке со стороны сайта
+
 try:
     with open('urls', 'r'):
         pass
@@ -56,19 +58,21 @@ def run():
         if status_code != 404:
             # Вторая защита
             if status_code == 429:
-                print('===BLOCKED===')
+                print(f'===BLOCKED=== via > {current_process().name}')
+                if not continue_if_blocked:
+                    exit()
                 #  NOTE: Попробуй использовать меньше процессов, ведь сайт заблокировал запросы за слишком частую отправку
                 while status_code == 429:
                     sleep(1)
                     status_code = requests.head(url).status_code
-                print('>>>UNBLOCKED')
+                print(f'>>>UNBLOCKED via > {current_process().name}')
                 continue
 
             print('^^^^^===^^^===========================================')
 
             # Третья защита
             if combo_opened_urls >= max_combo_to_block:
-                print('>>> BLOCKED')
+                print(f'>>> BLOCKED via > {current_process().name}')
                 print('NOTE: Сработала защита от спама вкладок в браузере, ведь подряд было открыто <max_combo_to_block> вкладок')
                 sleep(5)
                 exit()
