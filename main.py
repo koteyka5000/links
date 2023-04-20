@@ -15,6 +15,7 @@ string_len = 5 # Длинна строки для подбора
 max_combo_to_block = 2 # необходимое количество подряд открытых вкладок для аварийного завершения и предотвращения спама вкладками
 processes = 2 # Во сколько процессов работать (больше -> быстрее, но можно получить блокировку на сайте)
 continue_if_blocked = True # Продолжать ли выполнение программы при блокировке со стороны сайта
+exit_if_wrong_dir = True  # Завершать ли программу если она запустилась в месте, где нет файла urls 
 
 #  'текст, который нужно найти в ссылке': 'файл для записи ссылки, если в ней есть этот текст'
 #   Файлы самим создавать не надо, всё автоматически
@@ -26,13 +27,15 @@ split_sites = {'https://cards.metro-cc.ru/': 'urls_metro.txt',
                }
 write_in_both_files = False  # Записывать ли ссылки, для которых есть свой файл, 
                              # указанный в split_sites, дополнительно и в основной файл urls (кроме metro)
+write_errors_in_extra_file = True  # Записывать ли ссылки, которые выдали ошибку при запросе в отдельный файл для ошибок
 
 try:
     with open('urls', 'r'):
         pass
 except:
     print('Нету файла, возможно неверна директория')
-    exit()
+    if exit_if_wrong_dir:
+        exit()
 
 def write(file, url, redirected_url, after_separator=None):
     with open(file, 'a') as f:
@@ -41,7 +44,10 @@ def write(file, url, redirected_url, after_separator=None):
         if after_separator:
             f.write(f'[{time}] -> {url} | {after_separator}\n')
         elif url == redirected_url:
-            f.write(f'[{time}] -> {url} | !\n')
+            if write_errors_in_extra_file:  # Если записывать ошибки в отдельный файл
+                write('urls_error.txt', url, None, '!')
+            else:
+                f.write(f'[{time}] -> {url} | !\n')
         else:
             f.write(f'[{time}] -> {url} | {redirected_url}\n')
 
@@ -92,7 +98,10 @@ def run():
             try:
                 r = requests.get(url) # head не содержит переадресованной ссылки, а get содержит, но get работает медленнее
             except:
-                write('urls', url, None, 'FATAL ERROR')
+                if write_errors_in_extra_file:
+                    write('urls_error.txt', url, None, 'FATAL ERROR')
+                else:
+                    write('urls', url, None, 'FATAL ERROR')
                 continue
 
             combo_opened_urls += 1

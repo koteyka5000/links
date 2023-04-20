@@ -1,7 +1,8 @@
 links = []
 count_repeats = 0
 
-with open('urls', 'r') as f:
+file = 'urls_tg.txt'
+with open(file, 'r') as f:
     urls = f.readlines()
     for url in urls:
         start = url.find('->') + 3
@@ -10,6 +11,6 @@ with open('urls', 'r') as f:
         if url in links:
             print(url)
             count_repeats += 1
-        links.append(links)
+        links.append(url)
 
 print(f'Повторений: {count_repeats}')
