@@ -16,6 +16,17 @@ max_combo_to_block = 2 # необходимое количество подря�
 processes = 2 # Во сколько процессов работать (больше -> быстрее, но можно получить блокировку на сайте)
 continue_if_blocked = True # Продолжать ли выполнение программы при блокировке со стороны сайта
 
+#  'текст, который нужно найти в ссылке': 'файл для записи ссылки, если в ней есть этот текст'
+#   Файлы самим создавать не надо, всё автоматически
+split_sites = {'https://cards.metro-cc.ru/': 'urls_metro.txt',
+               '.img.avito.st/image': 'urls_avito.txt',
+               'https://t.me': 'urls_tg.txt',
+               'google': 'urls_google_yandex.txt',
+               'yandex': 'urls_google_yandex.txt',
+               }
+write_in_both_files = False  # Записывать ли ссылки, для которых есть свой файл, 
+                             # указанный в split_sites, дополнительно и в основной файл urls (кроме metro)
+
 try:
     with open('urls', 'r'):
         pass
@@ -84,16 +95,31 @@ def run():
                 write('urls', url, None, 'FATAL ERROR')
                 continue
 
-            if 'https://cards.metro-cc.ru/' in r.url: # Если сайт это metro
-                print('==METRO==')
-                write('urls_metro.txt', url, r.url)
-                continue
-
-            if is_open:
-                webbrowser.open(url, new=2)
-            if is_write:
-                write('urls', url, r.url)
             combo_opened_urls += 1
+
+            if is_open:  # Если открывать ссылку
+                webbrowser.open(url, new=2)
+
+            if is_write: # Если вообще хоть что-то записывать 
+                wrote_in_extra_file = False
+                for split_site in split_sites:
+                    if split_site in r.url:
+                        print(f'=={split_site}==')
+                        write(split_sites[split_site], url, r.url)
+                        wrote_in_extra_file = True
+                        break
+
+            
+
+                if 'https://cards.metro-cc.ru/' in r.url:  # Метро всегда записываем в отдельный файл
+                    continue
+
+                if wrote_in_extra_file and not write_in_both_files:  # Если мы уже записали в файл и не хотим чтобы ссылка была в обоих
+                    continue
+
+              
+                write('urls', url, r.url)
+            
         else:
             combo_opened_urls = 0
 
