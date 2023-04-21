@@ -34,6 +34,9 @@ try:
         pass
 except:
     print('Нету файла, возможно неверна директория')
+    print('Для исправления введи команду в терминал:')
+    print(f'cd {__file__[:-7]}')
+    
     if exit_if_wrong_dir:
         exit()
 
