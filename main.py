@@ -72,8 +72,6 @@ def run():
             s += random.choice(alpha)
         url = f'{site}/{s}'
 
-        url = 'https://t.me/joinchat/AAAAAEjWyBlK81wI-f6bXA'
-
         # Первая защита
         try:
             r = requests.head(url)
