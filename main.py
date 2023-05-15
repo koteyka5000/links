@@ -9,8 +9,8 @@ import datetime
 
 alpha = ascii_letters + '1234567890'
 site = 'https://goo.su' # Сайт для сокращения ссылок
-is_open =  0 # Открывать ли ссылку в браузере
-is_write = 1 # Записывать ли ссылку в файл
+is_open =  1 # Открывать ли ссылку в браузере
+is_write = 0 # Записывать ли ссылку в файл
 string_len = 5 # Длинна строки для подбора
 max_combo_to_block = 2 # необходимое количество подряд открытых вкладок для аварийного завершения и предотвращения спама вкладками
 processes = 2 # Во сколько процессов работать (больше -> быстрее, но можно получить блокировку на сайте)
@@ -25,6 +25,14 @@ split_sites = {'https://cards.metro-cc.ru/': 'urls_metro.txt',
                'google': 'urls_google_yandex.txt',
                'yandex': 'urls_google_yandex.txt',
                }
+
+
+# Открывать в браузере только эти ссылки (при is_open=1). Оставь список пустым для открытия всех ссылок
+# Можно ввести только часть ссылки, например '.img.avito.st/image' или просто 'google'
+open_only_this_sites = [
+
+                        ]
+
 write_in_both_files = False  # Записывать ли ссылки, для которых есть свой файл, 
                              # указанный в split_sites, дополнительно и в основной файл urls (кроме metro)
 write_errors_in_extra_file = True  # Записывать ли ссылки, которые выдали ошибку при запросе в отдельный файл для ошибок
@@ -63,6 +71,8 @@ def run():
         for i in range(string_len):
             s += random.choice(alpha)
         url = f'{site}/{s}'
+
+        url = 'https://t.me/joinchat/AAAAAEjWyBlK81wI-f6bXA'
 
         # Первая защита
         try:
@@ -110,7 +120,12 @@ def run():
             combo_opened_urls += 1
 
             if is_open:  # Если открывать ссылку
-                webbrowser.open(url, new=2)
+                if open_only_this_sites:  # Если открываем только определённые ссылки
+                    for url_ in open_only_this_sites:
+                        if url_ in url:  # Ищем кусок ссылки в найденной ссылке: например ищем t.me в https://t.me/...
+                            webbrowser.open(url, new=2)
+                else:  # Если открываем любые ссылки
+                    webbrowser.open(url, new=2)
 
             if is_write: # Если вообще хоть что-то записывать 
                 wrote_in_extra_file = False
